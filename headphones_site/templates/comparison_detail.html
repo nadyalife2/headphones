@@ -1,0 +1,69 @@
+<!-- templates/comparison_detail.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ comparison.title }}{% endblock %}
+
+{% block content %}
+  <main class="section">
+    <div class="container">
+      <article class="review-article">
+        <header class="review-header">
+          <h1>{{ comparison.title }}</h1>
+          {% if comparison.excerpt %}
+            <p class="excerpt">{{ comparison.excerpt }}</p>
+          {% endif %}
+          {% if comparison.tags.all %}
+            <div class="badges">
+              {% for t in comparison.tags.all %}
+                <a href="{% url 'tag_list' t.slug %}" class="badge">{{ t.name }}</a>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </header>
+
+
+        <!-- Блок сравнения с двумя картинками и VS -->
+        {% if comparison.cover1 and comparison.cover2 %}
+        <div class="compare-wrap">
+          <div class="compare">
+            <div class="panel">
+              <img src="{{ comparison.cover1.url }}" alt="{{ comparison.model1_name }}" class="thumb">
+              <h3>{{ comparison.model1_name }}</h3>
+            </div>
+            <div class="panel">
+              <img src="{{ comparison.cover2.url }}" alt="{{ comparison.model2_name }}" class="thumb">
+              <h3>{{ comparison.model2_name }}</h3>
+            </div>
+          </div>
+          <div class="vs">VS</div>
+        </div>
+        {% endif %}
+
+        <!-- Блоки сравнения с текстом слева/справа и изображениями -->
+        {% for block in comparison.blocks.all %}
+          <div class="article-block horizontal{% if block.text_position == 'right' %} reverse{% endif %}">
+            <div class="text-content">
+              {% if block.heading_text %}
+                <{{ block.heading_type }}>{{ block.heading_text }}</{{ block.heading_type }}>
+              {% endif %}
+              {{ block.text_content|safe }}
+            </div>
+
+            {% if block.image %}
+            <div class="image-container">
+              <figure class="card card--big">
+                <div class="{% if block.image_size == 'original' %}image-original{% elif block.image_size == 'square' %}image-square{% elif block.image_size == 'vertical' %}image-vertical{% else %}image-horizontal{% endif %}">
+                  <img src="{{ block.image.url }}" alt="{{ block.image_alt_text }}" class="thumb" {% if block.image_title %}title="{{ block.image_title }}"{% endif %}>
+                </div>
+                {% if block.image_caption %}
+                  <figcaption>{{ block.image_caption }}</figcaption>
+                {% endif %}
+              </figure>
+            </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </article>
+    </div>
+  </main>
+{% endblock %}

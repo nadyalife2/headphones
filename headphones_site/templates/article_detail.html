@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+  <main class="section">
+    <div class="container">
+      <article class="review-article">
+        <header class="review-header">
+          <h1>{{ article.title }}</h1>
+          {% if article.excerpt %}
+            <p class="excerpt">{{ article.excerpt }}</p>
+          {% endif %}
+          {% if article.tags.all %}
+            <div class="badges">
+              {% for t in article.tags.all %}
+                <a href="{% url 'tag_list' t.slug %}" class="badge">{{ t.name }}</a>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </header>
+
+        {% if article.cover %}
+          <figure class="featured-image card card--big">
+            <img src="{{ article.cover.url }}" alt="{{ article.title }}" class="thumb">
+          </figure>
+        {% endif %}
+
+        {% for block in article.blocks.all %}
+          <div class="article-block horizontal {% if block.text_position == 'right' %}reverse{% endif %}">
+            {% if block.text_position == 'right' %}
+              <!-- Изображение слева, Текст справа -->
+              {% if block.image %}
+                <div class="image-container">
+                  <figure class="card card--big">
+                    <div class="{% if block.image_size == 'original' %}image-original{% elif block.image_size == 'square' %}image-square{% elif block.image_size == 'vertical' %}image-vertical{% else %}image-horizontal{% endif %}">
+                      <img src="{{ block.image.url }}" alt="{{ block.image_alt_text|default:'' }}" class="thumb">
+                    </div>
+                    {% if block.image_caption %}
+                      <figcaption>{{ block.image_caption }}</figcaption>
+                    {% endif %}
+                  </figure>
+                </div>
+              {% endif %}
+
+              {% if block.text_content or block.heading_text %}
+                <div class="text-content">
+                  {% if block.heading_text %}
+                    <{{ block.heading_type }}>{{ block.heading_text }}</{{ block.heading_type }}>
+                  {% endif %}
+                  {% if block.text_content %}
+                    {{ block.text_content|safe }}
+                  {% endif %}
+                </div>
+              {% endif %}
+            {% else %}
+              <!-- Текст слева, Изображение справа -->
+              {% if block.text_content or block.heading_text %}
+                <div class="text-content">
+                  {% if block.heading_text %}
+                    <{{ block.heading_type }}>{{ block.heading_text }}</{{ block.heading_type }}>
+                  {% endif %}
+                  {% if block.text_content %}
+                    {{ block.text_content|safe }}
+                  {% endif %}
+                </div>
+              {% endif %}
+
+              {% if block.image %}
+                <div class="image-container">
+                  <figure class="card card--big">
+                    <div class="{% if block.image_size == 'original' %}image-original{% elif block.image_size == 'square' %}image-square{% elif block.image_size == 'vertical' %}image-vertical{% else %}image-horizontal{% endif %}">
+                      <img src="{{ block.image.url }}" alt="{{ block.image_alt_text|default:'' }}" class="thumb">
+                    </div>
+                    {% if block.image_caption %}
+                      <figcaption>{{ block.image_caption }}</figcaption>
+                    {% endif %}
+                  </figure>
+                </div>
+              {% endif %}
+            {% endif %}
+          </div>
+        {% endfor %}
+
+      </article>
+    </div>
+  </main>
+{% endblock %}

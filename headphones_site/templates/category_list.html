@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="section">
+    <div class="container">
+        <h1>{{ page_title }}</h1>
+        
+        <!-- Сортировка -->
+        <div class="sort-container">
+            <div class="sort-wrapper">
+                <span>Сортировать по:</span>
+                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}sort=-created_at"
+                   class="tag {% if current_sort == '-created_at' %}tag--active{% endif %}">Новизне</a>
+                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}sort=created_at"
+                   class="tag {% if current_sort == 'created_at' %}tag--active{% endif %}">Старше</a>
+                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}sort=title"
+                   class="tag {% if current_sort == 'title' %}tag--active{% endif %}">Алфавиту</a>
+            </div>
+        </div>
+
+        <!-- Поиск -->
+        <form method="get" style="margin-bottom: 24px;">
+            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Поиск по статьям" style="padding: 8px; width: 300px;">
+            <button type="submit" style="padding: 8px 16px;">Найти</button>
+        </form>
+
+        <!-- Статьи -->
+        <div class="grid">
+            {% for article in page_obj %}
+            <article class="card card2">
+                {% if article.cover %}
+                <img src="{{ article.cover.url }}" alt="{{ article.title }}" class="card__image">
+                {% else %}
+                <div class="card__image" style="background:#eee;"></div>
+                {% endif %}
+                <div class="card__content" style="padding-left:10px">
+                    <h3><a href="{% url 'article_detail' article.slug %}">{{ article.title }}</a></h3>
+                    <p class="card__excerpt">{{ article.excerpt|truncatewords:20 }}</p>
+                    <div class="card__meta">
+                        <span class="date">{{ article.created_at|date:"d.m.Y" }}</span>
+                    </div>
+                    <!-- Добавленные теги -->
+                    {% if article.tags.all %}
+                    <div class="badges" style="margin-top: 12px;">
+                        {% for tag_item in article.tags.all|slice:":2" %}
+                            <a href="{% url 'tag_list' tag_item.slug %}"
+                               class="badge">{{ tag_item.name }}</a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </article>
+            {% empty %}
+            <p>Статей не найдено.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Пагинация -->
+        {% if page_obj.has_other_pages %}
+        <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 32px;">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                   class="tag" style="text-decoration: none;">←</a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="tag" style="background: var(--accent); color: #fff; border-color: var(--accent);">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                       class="tag" style="text-decoration: none;">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                   class="tag" style="text-decoration: none;">→</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

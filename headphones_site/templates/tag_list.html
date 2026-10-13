@@ -1,0 +1,157 @@
+<!-- tag_list.html -->
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="section">
+    <div class="container">
+        <h1>{{ page_title }}</h1>
+
+        <!-- Сортировка -->
+        <div class="sort-container">
+            <div class="sort-wrapper">
+                <span>Сортировать по:</span>
+                <a href="?sort=-created_at{% if q %}&q={{ q }}{% endif %}"
+                   class="tag {% if current_sort == '-created_at' %}tag--active{% endif %}">Новизне</a>
+                <a href="?sort=created_at{% if q %}&q={{ q }}{% endif %}"
+                   class="tag {% if current_sort == 'created_at' %}tag--active{% endif %}">Старше</a>
+                <a href="?sort=title{% if q %}&q={{ q }}{% endif %}"
+                   class="tag {% if current_sort == 'title' %}tag--active{% endif %}">Алфавиту</a>
+            </div>
+        </div>
+
+        <!-- Поиск -->
+        <form method="get" style="margin-bottom: 24px;">
+            <input type="text" name="q" value="{{ q }}" placeholder="Поиск по тегу" style="padding: 8px; width: 300px;">
+            <button type="submit" style="padding: 8px 16px;">Найти</button>
+        </form>
+
+        <!-- Список материалов -->
+        <div class="grid">
+            {% for item in page_obj %}
+                {% if item.type == 'article' %}
+                    <article class="card">
+                        {% if item.object.cover %}
+                        <img src="{{ item.object.cover.url }}" alt="{{ item.object.title }}" class="card__image">
+                        {% else %}
+                        <div class="card__image" style="background:#eee;"></div>
+                        {% endif %}
+                        <div class="card__content" style="padding-left:10px">
+                            <h3><a href="{% url 'article_detail' item.object.slug %}">{{ item.object.title }}</a></h3>
+                            <p class="card__excerpt">{{ item.object.excerpt|truncatewords:20 }}</p>
+                            <div class="card__meta">
+                                <span class="date">{{ item.object.created_at|date:"d.m.Y" }}</span>
+                                <span class="category">{{ item.object.get_category_display }}</span>
+                            </div>
+
+                            <!-- Теги -->
+                            {% if item.object.tags.all %}
+                            <div class="badges" style="margin-top: 12px;">
+                                {% for tag_item in item.object.tags.all|slice:":2" %}
+                                    <a href="{% url 'tag_list' tag_item.slug %}?sort={{ current_sort }}{% if q %}&q={{ q }}{% endif %}"
+                                       class="badge {% if tag_item.slug == current_tag_slug %}tag--active{% endif %}">{{ tag_item.name }}</a>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </article>
+                {% elif item.type == 'comparison' %}
+                <div class="comparisons-grid">
+                    <div class="compare-wrap" style="position: relative; margin-bottom: 40px;">
+                        <div class="compare" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <!-- Карточка первой модели -->
+                            <div class="card card--big" data-category="comparisons">
+                                {% if item.object.cover1 %}
+                                    <img class="thumb" src="{{ item.object.cover1.url }}" alt="{{ item.object.model1_name }}" style="display: block; width: 100%; height: 240px; object-fit: cover;">
+                                {% else %}
+                                    <img class="thumb" src="/static/assets/img/placeholders/article-cover.png" alt="{{ item.object.model1_name }}" style="display: block; width: 100%; height: 240px; object-fit: cover;">
+                                {% endif %}
+                                <div class="pad">
+                                    <h3 style="margin: 0 0 8px 0; font-size: 1.15rem; font-weight: 600;"><a href="{% url 'comparison_detail' item.object.slug %}" style="text-decoration: none; color: inherit;">{{ item.object.model1_name }}</a></h3>
+                                    <p class="excerpt" style="color: var(--muted); margin-top: .4rem; line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">{{ item.object.excerpt|truncatewords:15 }}</p>
+
+                                    <!-- Добавленные дата и категория -->
+                                    <div class="card__meta" style="margin-top: 10px; font-size: 0.9rem; color: #666;">
+                                        <span class="date">{{ item.object.created_at|date:"d.m.Y" }}</span>
+                                        <span class="category">{{ item.object.get_category_display }}</span>
+                                    </div>
+
+                                    <div class="badges" style="display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .6rem;">
+                                        {% for tag in item.object.tags.all|slice:":2" %}
+                                            <a href="{% url 'tag_list' tag.slug %}?sort={{ current_sort }}{% if q %}&q={{ q }}{% endif %}"
+                                               class="badge {% if tag.slug == current_tag_slug %}tag--active{% endif %}"
+                                               style="background: #fff; border: 2px solid var(--accent); border-radius: 999px; padding: .35em .7em; font-size: .82rem; font-weight: 800; transition: all .2s ease; text-decoration: none; color: inherit;">{{ tag.name }}</a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Карточка второй модели -->
+                            <div class="card card--tall" data-category="comparisons">
+                                {% if item.object.cover2 %}
+                                    <img class="thumb" src="{{ item.object.cover2.url }}" alt="{{ item.object.model2_name }}" style="display: block; width: 100%; height: 240px; object-fit: cover;">
+                                {% else %}
+                                    <img class="thumb" src="/static/assets/img/placeholders/article-cover.png" alt="{{ item.object.model2_name }}" style="display: block; width: 100%; height: 240px; object-fit: cover;">
+                                {% endif %}
+                                <div class="pad">
+                                    <h3 style="margin: 0 0 8px 0; font-size: 1.15rem; font-weight: 600;"><a href="{% url 'comparison_detail' item.object.slug %}" style="text-decoration: none; color: inherit;">{{ item.object.model2_name }}</a></h3>
+                                    <p class="excerpt" style="color: var(--muted); margin-top: .4rem; line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">{{ item.object.excerpt|truncatewords:15 }}</p>
+
+                                    <!-- Добавленные дата и категория -->
+                                    <div class="card__meta" style="margin-top: 10px; font-size: 0.9rem; color: #666;">
+                                        <span class="date">{{ item.object.created_at|date:"d.m.Y" }}</span>
+                                        <span class="category">{{ item.object.get_category_display }}</span>
+                                    </div>
+
+                                    <div class="badges" style="display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .6rem;">
+                                        {% for tag in item.object.tags.all|slice:":2" %}
+                                            <a href="{% url 'tag_list' tag.slug %}?sort={{ current_sort }}{% if q %}&q={{ q }}{% endif %}"
+                                               class="badge {% if tag.slug == current_tag_slug %}tag--active{% endif %}"
+                                               style="background: #fff; border: 2px solid var(--accent); border-radius: 999px; padding: .35em .7em; font-size: .82rem; font-weight: 800; transition: all .2s ease; text-decoration: none; color: inherit;">{{ tag.name }}</a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Вынесенный VS-блок с ссылкой -->
+                        <a href="{% url 'comparison_detail' item.object.slug %}" class="vs-link" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: all; z-index: 2; text-decoration: none;">
+                            <span class="vs-label" style="width: 60px; height: 60px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.2s ease;">
+                                VS
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            {% empty %}
+            <p>Материалов по этому тегу не найдено.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Пагинация -->
+        {% if page_obj.has_other_pages %}
+        <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 32px;">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}"
+                   class="tag" style="text-decoration: none;">←</a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="tag" style="background: var(--accent); color: #fff; border-color: var(--accent);">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}{% if q %}&q={{ q }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}"
+                       class="tag" style="text-decoration: none;">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}"
+                   class="tag" style="text-decoration: none;">→</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

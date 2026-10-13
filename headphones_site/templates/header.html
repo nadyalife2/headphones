@@ -1,0 +1,49 @@
+<header class="hero section" id="top">
+    <div class="container">
+      <a href="#top" class="side-logo" id="sideLogo" aria-label="Звук в уХах - Вернуться к началу">
+        <span class="side-logo__text">Звук в уХах</span>
+      </a>
+      <div class="panel">
+        <p>Свежие новости, честные обзоры беспроводных наушников и наглядные сравнения моделей. Живая подача, без лишнего шума.</p>
+
+        <!-- Навигация по категориям -->
+        <nav class="top-nav" aria-label="Разделы сайта">
+          <ul class="nav-chips">
+            <li>
+              <a href="{% url 'home' %}" class="{% if current_category == 'home' %}active{% endif %}">
+                Главная
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'category_articles' 'news' %}" class="{% if current_category == 'news' %}active{% endif %}">
+                Новости
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'category_articles' 'review' %}" class="{% if current_category == 'review' %}active{% endif %}">
+                Обзоры
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'comparison_list' %}" class="{% if current_category == 'comparison' %}active{% endif %}">
+                Сравнения
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+</header>
+
+<!-- Секция с тегами -->
+<section class="section section-tags" aria-label="Популярные теги">
+  <div class="container">
+    <div class="marquee" id="marquee">
+      <div class="marquee-track" id="marqueeTrack">
+        {% for tag in popular_tags %}
+          <a href="{% url 'tag_list' tag.slug %}" class="tag" tabindex="0">#{{ tag.name }}</a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>

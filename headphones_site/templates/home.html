@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+
+<section class="section category-section" id="news">
+  <div class="container">
+    <header class="major"><h2><a href="{% url 'category_articles' category='news' %}">Новости</a></h2></header>
+    <div class="grid asym-grid">
+      {% for a in page_obj_news %}
+        <article class="card
+          {% if forloop.first %}card--big
+          {% elif forloop.counter == 2 %}card--tall
+          {% elif forloop.counter == 3 or forloop.counter == 4 or forloop.counter == 5 %}card--mid
+          {% endif %}">
+          {% if a.cover %}
+            <img class="thumb" src="{{ a.cover.url }}" alt="{{ a.title }}">
+          {% else %}
+            <img class="thumb" src="{% static 'assets/img/placeholders/article-cover.png' %}" alt="{{ a.title }}">
+          {% endif %}
+          <div class="pad">
+            <h3><a href="{% url 'article_detail' slug=a.slug %}">{{ a.title }}</a></h3>
+            <p class="excerpt">{{ a.excerpt }}</p>
+            <div class="badges">
+              {% for tag in a.tags.all|slice:":2" %}
+                <a href="{% url 'tag_list' tag.slug %}" class="badge">{{ tag.name }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        </article>
+      {% empty %}
+        <p>Нет материалов.</p>
+      {% endfor %}
+    </div>
+
+    <!-- Пагинация для новостей -->
+    <div class="category-pagination">
+      <div class="pager">
+        {% if page_obj_news.has_previous %}
+          <a href="?page_news={{ page_obj_news.previous_page_number }}{% if page_obj_reviews.number %}&page_reviews={{ page_obj_reviews.number }}{% endif %}{% if page_obj_comparisons.number %}&page_comparisons={{ page_obj_comparisons.number }}{% endif %}" class="arrow">←</a>
+        {% else %}
+          <a href="#" class="arrow" aria-disabled="true">←</a>
+        {% endif %}
+
+        {% for num in page_obj_news.paginator.page_range %}
+          {% if page_obj_news.number == num %}
+            <a href="?page_news={{ num }}{% if page_obj_reviews.number %}&page_reviews={{ page_obj_reviews.number }}{% endif %}{% if page_obj_comparisons.number %}&page_comparisons={{ page_obj_comparisons.number }}{% endif %}" class="num is-active">{{ num }}</a>
+          {% else %}
+            <a href="?page_news={{ num }}{% if page_obj_reviews.number %}&page_reviews={{ page_obj_reviews.number }}{% endif %}{% if page_obj_comparisons.number %}&page_comparisons={{ page_obj_comparisons.number }}{% endif %}" class="num">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj_news.has_next %}
+          <a href="?page_news={{ page_obj_news.next_page_number }}{% if page_obj_reviews.number %}&page_reviews={{ page_obj_reviews.number }}{% endif %}{% if page_obj_comparisons.number %}&page_comparisons={{ page_obj_comparisons.number }}{% endif %}" class="arrow">→</a>
+        {% else %}
+          <a href="#" class="arrow" aria-disabled="true">→</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Раздел "Обзоры" -->
+<section class="section category-section" id="reviews">
+  <div class="container">
+    <header class="major"><h2><a href="{% url 'category_articles' category='review' %}">Обзоры</a></h2></header>
+
+    <div class="grid asym-grid">
+      {% for a in page_obj_reviews %}
+        <article class="card
+                        {% if forloop.first %}card--tall
+                        {% elif forloop.counter == 2 %}card--small
+                        {% else %}card--mid
+                        {% endif %}">
+          {% if a.cover %}
+            <img class="thumb" src="{{ a.cover.url }}" alt="{{ a.title }}">
+          {% else %}
+            <img class="thumb" src="{% static 'assets/img/placeholders/article-cover.png' %}" alt="{{ a.title }}">
+          {% endif %}
+          <div class="pad">
+            <h3><a href="{% url 'article_detail' slug=a.slug %}">{{ a.title }}</a></h3>
+            <p class="excerpt">{{ a.excerpt }}</p>
+            <!-- Добавленные теги -->
+            <div class="badges">
+              {% for tag in a.tags.all|slice:":2" %}
+                <a href="{% url 'tag_list' tag.slug %}" class="badge">{{ tag.name }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        </article>
+      {% empty %}
+        <p>Нет материалов.</p>
+      {% endfor %}
+    </div>
+
+   <!-- Пагинация для категории "Обзоры" -->
+    <div class="category-pagination">
+      <div class="pager">
+        {% if page_obj_reviews.has_previous %}
+          <a href="?page_reviews={{ page_obj_reviews.previous_page_number }}{% if page_obj_news.number %}&page_news={{ page_obj_news.number }}{% endif %}{% if page_obj_comparisons.number %}&page_comparisons={{ page_obj_comparisons.number }}{% endif %}" class="arrow">←</a>
+        {% else %}
+          <a href="#" class="arrow" aria-disabled="true">←</a>
+        {% endif %}
+
+        {% for num in page_obj_reviews.paginator.page_range %}
+          {% if page_obj_reviews.number == num %}
+            <a href="?page_reviews={{ num }}{% if page_obj_news.number %}&page_news={{ page_obj_news.number }}{% endif %}{% if page_obj_comparisons.number %}&page_comparisons={{ page_obj_comparisons.number }}{% endif %}" class="num is-active">{{ num }}</a>
+          {% else %}
+            <a href="?page_reviews={{ num }}{% if page_obj_news.number %}&page_news={{ page_obj_news.number }}{% endif %}{% if page_obj_comparisons.number %}&page_comparisons={{ page_obj_comparisons.number }}{% endif %}" class="num">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj_reviews.has_next %}
+          <a href="?page_reviews={{ page_obj_reviews.next_page_number }}{% if page_obj_news.number %}&page_news={{ page_obj_news.number }}{% endif %}{% if page_obj_comparisons.number %}&page_comparisons={{ page_obj_comparisons.number }}{% endif %}" class="arrow">→</a>
+        {% else %}
+          <a href="#" class="arrow" aria-disabled="true">→</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Раздел "Сравнения" -->
+<section class="section category-section" id="comparisons">
+  <div class="container">
+    <header class="major"><h2><a href="{% url 'comparison_list' %}">Сравнения</a></h2></header>
+
+    <div class="grid asym-grid compare-grid">
+      {% for comparison in page_obj_comparisons %}
+        <article class="card card--big" data-category="comparisons">
+          {% if comparison.cover1 %}
+            <img class="thumb" src="{{ comparison.cover1.url }}" alt="{{ comparison.model1_name }}">
+          {% else %}
+            <img class="thumb" src="{% static 'assets/img/placeholders/article-cover.png' %}" alt="{{ comparison.model1_name }}">
+          {% endif %}
+          <div class="pad">
+            <h3><a href="{% url 'comparison_detail' slug=comparison.slug %}">{{ comparison.model1_name }}</a></h3>
+            <p class="excerpt">{{ comparison.excerpt|truncatewords:15 }}</p>
+            <!-- Добавленные теги для первой карточки -->
+            <div class="badges">
+              {% for tag in comparison.tags.all|slice:":2" %}
+                <a href="{% url 'tag_list' tag.slug %}" class="badge">{{ tag.name }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        </article>
+
+        <div class="compare-divider">
+          <span class="vs-label">VS</span>
+        </div>
+
+        <article class="card card--tall" data-category="comparisons">
+          {% if comparison.cover2 %}
+            <img class="thumb" src="{{ comparison.cover2.url }}" alt="{{ comparison.model2_name }}">
+          {% else %}
+            <img class="thumb" src="{% static 'assets/img/placeholders/article-cover.png' %}" alt="{{ comparison.model2_name }}">
+          {% endif %}
+          <div class="pad">
+            <h3><a href="{% url 'comparison_detail' slug=comparison.slug %}">{{ comparison.model2_name }}</a></h3>
+            <p class="excerpt">{{ comparison.excerpt|truncatewords:15 }}</p>
+            <!-- Добавленные теги для второй карточки -->
+            <div class="badges">
+              {% for tag in comparison.tags.all|slice:":2" %}
+                <a href="{% url 'tag_list' tag.slug %}" class="badge">{{ tag.name }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        </article>
+      {% empty %}
+        <p>Нет материалов.</p>
+      {% endfor %}
+    </div>
+
+    <!-- Пагинация для категории "Сравнения" -->
+    <div class="category-pagination">
+      <div class="pager">
+        {% if page_obj_comparisons.has_previous %}
+          <a href="?page_comparisons={{ page_obj_comparisons.previous_page_number }}{% if page_obj_news.number %}&page_news={{ page_obj_news.number }}{% endif %}{% if page_obj_reviews.number %}&page_reviews={{ page_obj_reviews.number }}{% endif %}" class="arrow">←</a>
+        {% else %}
+          <a href="#" class="arrow" aria-disabled="true">←</a>
+        {% endif %}
+
+        {% for num in page_obj_comparisons.paginator.page_range %}
+          {% if page_obj_comparisons.number == num %}
+            <a href="?page_comparisons={{ num }}{% if page_obj_news.number %}&page_news={{ page_obj_news.number }}{% endif %}{% if page_obj_reviews.number %}&page_reviews={{ page_obj_reviews.number }}{% endif %}" class="num is-active">{{ num }}</a>
+          {% else %}
+            <a href="?page_comparisons={{ num }}{% if page_obj_news.number %}&page_news={{ page_obj_news.number }}{% endif %}{% if page_obj_reviews.number %}&page_reviews={{ page_obj_reviews.number }}{% endif %}" class="num">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj_comparisons.has_next %}
+          <a href="?page_comparisons={{ page_obj_comparisons.next_page_number }}{% if page_obj_news.number %}&page_news={{ page_obj_news.number }}{% endif %}{% if page_obj_reviews.number %}&page_reviews={{ page_obj_reviews.number }}{% endif %}" class="arrow">→</a>
+        {% else %}
+          <a href="#" class="arrow" aria-disabled="true">→</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

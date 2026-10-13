@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>{% block title %}Headphones{% endblock %}</title>
+
+ <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{% static 'favicon.ico' %}">
+
+  <!-- Базовые стили проекта -->
+  <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/custom.css' %}">
+
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  {% include 'header.html' %}
+
+  <main id="content">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include 'footer.html' %}
+
+  <!-- Базовые скрипты -->
+  <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+  <script src="{% static 'assets/js/browser.min.js' %}"></script>
+  <script src="{% static 'assets/js/breakpoints.min.js' %}"></script>
+  <script src="{% static 'assets/js/jquery.dropotron.min.js' %}"></script>
+
+  <!-- Ваши общие скрипты -->
+ <script src="{% static 'assets/js/common.js' %}"></script>
+  <script src="{% static 'assets/js/util.js' %}"></script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
